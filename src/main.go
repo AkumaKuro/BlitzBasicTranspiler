@@ -1,13 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"os"
+
+	"github.com/AkumaKuro/BlitzBasicTranspiler/src/lexer"
 )
 
 func main() {
 	bytes, _ := os.ReadFile("./examples/example001.bb")
 	source := string(bytes)
 
-	fmt.Printf("%s\n", source)
+	tokens := lexer.Tokenize(source)
+
+	for _, token := range tokens {
+		token.Print()
+	}
 }
