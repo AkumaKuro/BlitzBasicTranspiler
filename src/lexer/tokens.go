@@ -6,11 +6,18 @@ type TokenKind int
 
 const (
 	EOF TokenKind = iota
-	NUMBER
+	COMMENT
+
+	NUM_LIT
+	STR_LIT
+
+	IDENT
 
 	PLUS
 	MINUS
 	STAR
+
+	EQ
 
 	OPEN_PR
 	CLOSE_PR
@@ -39,7 +46,7 @@ func (token Token) IsOneOfMany(expectedKinds ...TokenKind) bool {
 }
 
 func (token Token) Print() {
-	if token.kind == NUMBER {
+	if token.IsOneOfMany(NUM_LIT, STR_LIT, IDENT) {
 		fmt.Printf(
 			"Type: %s, Value: %s\n",
 			TokenKindString(token.kind),
@@ -60,12 +67,18 @@ func TokenKindString(kind TokenKind) string {
 		return "-"
 	case STAR:
 		return "*"
-	case NUMBER:
+	case NUM_LIT:
 		return "Num"
 	case OPEN_PR:
 		return "("
 	case CLOSE_PR:
 		return ")"
+	case IDENT:
+		return "Ident"
+	case STR_LIT:
+		return "Str"
+	case COMMENT:
+		return "Comment"
 	default:
 		println("Error, token %s not implemented", kind)
 	}
