@@ -19,7 +19,7 @@ const (
 	PLUS
 	MINUS
 	STAR
-	DIV
+	SLASH
 	NOT
 	MOD
 
@@ -102,6 +102,20 @@ const (
 
 	INCLUDE
 	END
+
+	OPEN_BR
+	CLOSE_BR
+
+	INT_SIG
+	FLT_SIG
+	STR_SIG
+
+	HEX_INT
+
+	COLON
+	DOT
+	BSLASH
+	EXP
 )
 
 var reserved_keywords map[string]TokenKind = map[string]TokenKind{
@@ -186,7 +200,7 @@ func (token Token) IsOneOfMany(expectedKinds ...TokenKind) bool {
 }
 
 func (token Token) Print() {
-	if token.IsOneOfMany(INT_LIT, FLT_LIT, STR_LIT, IDENT, COMMENT) {
+	if token.IsOneOfMany(INT_LIT, FLT_LIT, STR_LIT, IDENT, COMMENT, HEX_INT) {
 		fmt.Printf(
 			"Type: %s, Value: %s\n",
 			TokenKindString(token.kind),
@@ -219,7 +233,7 @@ func TokenKindString(kind TokenKind) string {
 		return "MINUS"
 	case STAR:
 		return "STAR"
-	case DIV:
+	case SLASH:
 		return "DIV"
 	case NOT:
 		return "NOT"
@@ -353,6 +367,26 @@ func TokenKindString(kind TokenKind) string {
 		return "END"
 	case NL:
 		return "NewLine"
+	case OPEN_BR:
+		return "["
+	case CLOSE_BR:
+		return "]"
+	case INT_SIG:
+		return "IntSig"
+	case FLT_SIG:
+		return "FltSig"
+	case STR_SIG:
+		return "StrSig"
+	case HEX_INT:
+		return "Hex"
+	case COLON:
+		return ":"
+	case DOT:
+		return "."
+	case BSLASH:
+		return "\\"
+	case EXP:
+		return "^"
 	default:
 		return fmt.Sprintf("Error, token %d not implemented\n", kind)
 	}

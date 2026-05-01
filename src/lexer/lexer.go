@@ -80,6 +80,12 @@ func commentHandler(lex *lexer, regex *regexp.Regexp) {
 	lex.advanceN(len(match))
 }
 
+func hexHandler(lex *lexer, regex *regexp.Regexp) {
+	match := regex.FindString(lex.remainder())
+	lex.push(NewToken(HEX_INT, match))
+	lex.advanceN(len(match))
+}
+
 func symbolHandler(lex *lexer, regex *regexp.Regexp) {
 	match := regex.FindString(lex.remainder())
 
@@ -106,19 +112,30 @@ func createLexer(source string) *lexer {
 		pos:    0,
 		patterns: []pattern{
 			{regexp.MustCompile(`\"[^\"]*\"`), stringHandler},
+			{regexp.MustCompile(`\$[0-9a-fA-F]+`), hexHandler},
 			{regexp.MustCompile(`\;.*`), commentHandler},
-			{regexp.MustCompile(`[a-zA-Z]+`), symbolHandler},
+			{regexp.MustCompile(`[a-zA-Z_]+`), symbolHandler},
 			{regexp.MustCompile(`[0-9]+(\.[0-9]+)`), floatHandler},
 			{regexp.MustCompile(`[0-9]+`), intHandler},
+			{regexp.MustCompile(`\.`), defaultHandler(DOT, ".")},
 			{regexp.MustCompile(`\(`), defaultHandler(OPEN_PR, "(")},
 			{regexp.MustCompile(`\)`), defaultHandler(CLOSE_PR, ")")},
+			{regexp.MustCompile(`\[`), defaultHandler(OPEN_BR, "[")},
+			{regexp.MustCompile(`\]`), defaultHandler(CLOSE_BR, "]")},
 			{regexp.MustCompile(`\+`), defaultHandler(PLUS, "+")},
 			{regexp.MustCompile(`\-`), defaultHandler(MINUS, "-")},
 			{regexp.MustCompile(`\*`), defaultHandler(STAR, "*")},
+			{regexp.MustCompile(`\/`), defaultHandler(SLASH, "/")},
+			{regexp.MustCompile(`\\`), defaultHandler(BSLASH, "\\")},
+			{regexp.MustCompile(`\^`), defaultHandler(EXP, "^")},
 			{regexp.MustCompile(`\<`), defaultHandler(LT, "<")},
 			{regexp.MustCompile(`\>`), defaultHandler(GT, ">")},
 			{regexp.MustCompile(`\=`), defaultHandler(EQ, "=")},
 			{regexp.MustCompile(`\,`), defaultHandler(COMMA, ",")},
+			{regexp.MustCompile(`\$`), defaultHandler(STR_SIG, "$")},
+			{regexp.MustCompile(`\%`), defaultHandler(INT_SIG, "%")},
+			{regexp.MustCompile(`\#`), defaultHandler(FLT_SIG, "#")},
+			{regexp.MustCompile(`\:`), defaultHandler(COLON, ":")},
 			{regexp.MustCompile(`\r?\n`), newLineHandler},
 			{regexp.MustCompile(`\s+`), skipHandler},
 		},
@@ -144,7 +161,7 @@ func Tokenize(source string) []Token {
 		if !matched {
 			panic(fmt.Sprintf(
 				"Lexer error: Unrecognized token near %s",
-				lex.remainder(),
+				lex.remainder()[:min(len(lex.remainder()), 10)],
 			))
 		}
 	}
