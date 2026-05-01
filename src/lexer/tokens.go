@@ -178,7 +178,7 @@ var reserved_keywords map[string]TokenKind = map[string]TokenKind{
 }
 
 type Token struct {
-	kind  TokenKind
+	Kind  TokenKind
 	value string
 }
 
@@ -191,7 +191,7 @@ func NewToken(kind TokenKind, value string) Token {
 
 func (token Token) IsOneOfMany(expectedKinds ...TokenKind) bool {
 	for _, expected := range expectedKinds {
-		if token.kind == expected {
+		if token.Kind == expected {
 			return true
 		}
 	}
@@ -203,11 +203,11 @@ func (token Token) Print() {
 	if token.IsOneOfMany(INT_LIT, FLT_LIT, STR_LIT, IDENT, COMMENT, HEX_INT) {
 		fmt.Printf(
 			"Type: %s, Value: %s\n",
-			TokenKindString(token.kind),
+			TokenKindString(token.Kind),
 			token.value,
 		)
 	} else {
-		fmt.Printf("Type: %s\n", TokenKindString(token.kind))
+		fmt.Printf("Type: %s\n", TokenKindString(token.Kind))
 	}
 }
 

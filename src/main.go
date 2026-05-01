@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	bytes, _ := os.ReadFile("./examples/example003.bb")
+	bytes, _ := os.ReadFile("./examples/example004.bb")
 	source := string(bytes)
 
 	tokens := lexer.Tokenize(source)
