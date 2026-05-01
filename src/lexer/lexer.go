@@ -3,6 +3,7 @@ package lexer
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 type regexHandler = func(lex *lexer, regex *regexp.Regexp)
@@ -46,9 +47,21 @@ func defaultHandler(kind TokenKind, value string) regexHandler {
 	}
 }
 
-func numberHandler(lex *lexer, regex *regexp.Regexp) {
+func newLineHandler(lex *lexer, regex *regexp.Regexp) {
 	match := regex.FindString(lex.remainder())
-	lex.push(NewToken(NUM_LIT, match))
+	lex.advanceN(len(match))
+	lex.push(NewToken(NL, "\n"))
+}
+
+func floatHandler(lex *lexer, regex *regexp.Regexp) {
+	match := regex.FindString(lex.remainder())
+	lex.push(NewToken(FLT_LIT, match))
+	lex.advanceN(len(match))
+}
+
+func intHandler(lex *lexer, regex *regexp.Regexp) {
+	match := regex.FindString(lex.remainder())
+	lex.push(NewToken(INT_LIT, match))
 	lex.advanceN(len(match))
 }
 
@@ -67,9 +80,17 @@ func commentHandler(lex *lexer, regex *regexp.Regexp) {
 	lex.advanceN(len(match))
 }
 
-func identHandler(lex *lexer, regex *regexp.Regexp) {
+func symbolHandler(lex *lexer, regex *regexp.Regexp) {
 	match := regex.FindString(lex.remainder())
-	lex.push(NewToken(IDENT, match))
+
+	match = strings.ToLower(match)
+
+	if kind, exists := reserved_keywords[match]; exists {
+		lex.push(NewToken(kind, match))
+	} else {
+		lex.push(NewToken(IDENT, match))
+	}
+
 	lex.advanceN(len(match))
 }
 
@@ -86,15 +107,20 @@ func createLexer(source string) *lexer {
 		patterns: []pattern{
 			{regexp.MustCompile(`\"[^\"]*\"`), stringHandler},
 			{regexp.MustCompile(`\;.*`), commentHandler},
-			{regexp.MustCompile(`[a-zA-Z]+`), identHandler},
-			{regexp.MustCompile(`\s+`), skipHandler},
-			{regexp.MustCompile(`[0-9]+(\.[0-9]+)?`), numberHandler},
+			{regexp.MustCompile(`[a-zA-Z]+`), symbolHandler},
+			{regexp.MustCompile(`[0-9]+(\.[0-9]+)?`), floatHandler},
+			{regexp.MustCompile(`[0-9]+`), intHandler},
 			{regexp.MustCompile(`\(`), defaultHandler(OPEN_PR, "(")},
 			{regexp.MustCompile(`\)`), defaultHandler(CLOSE_PR, ")")},
 			{regexp.MustCompile(`\+`), defaultHandler(PLUS, "+")},
 			{regexp.MustCompile(`\-`), defaultHandler(MINUS, "-")},
 			{regexp.MustCompile(`\*`), defaultHandler(STAR, "*")},
+			{regexp.MustCompile(`\<`), defaultHandler(LT, "<")},
+			{regexp.MustCompile(`\>`), defaultHandler(GT, ">")},
 			{regexp.MustCompile(`\=`), defaultHandler(EQ, "=")},
+			{regexp.MustCompile(`\,`), defaultHandler(COMMA, ",")},
+			{regexp.MustCompile(`\r?\n`), newLineHandler},
+			{regexp.MustCompile(`\s+`), skipHandler},
 		},
 	}
 }

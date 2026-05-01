@@ -1,1 +1,1 @@
-a = 13 ; this is a comment
+Global a = 13 ; this is a comment
