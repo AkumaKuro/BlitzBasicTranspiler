@@ -46,7 +46,7 @@ func (token Token) IsOneOfMany(expectedKinds ...TokenKind) bool {
 }
 
 func (token Token) Print() {
-	if token.IsOneOfMany(NUM_LIT, STR_LIT, IDENT) {
+	if token.IsOneOfMany(NUM_LIT, STR_LIT, IDENT, COMMENT) {
 		fmt.Printf(
 			"Type: %s, Value: %s\n",
 			TokenKindString(token.kind),
@@ -79,8 +79,10 @@ func TokenKindString(kind TokenKind) string {
 		return "Str"
 	case COMMENT:
 		return "Comment"
+	case EQ:
+		return "="
 	default:
-		println("Error, token %s not implemented", kind)
+		fmt.Printf("Error, token %s not implemented\n", kind)
 	}
 
 	return ""

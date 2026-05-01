@@ -68,7 +68,9 @@ func commentHandler(lex *lexer, regex *regexp.Regexp) {
 }
 
 func identHandler(lex *lexer, regex *regexp.Regexp) {
-	//TODO
+	match := regex.FindString(lex.remainder())
+	lex.push(NewToken(IDENT, match))
+	lex.advanceN(len(match))
 }
 
 func skipHandler(lex *lexer, regex *regexp.Regexp) {
@@ -84,7 +86,7 @@ func createLexer(source string) *lexer {
 		patterns: []pattern{
 			{regexp.MustCompile(`\"[^\"]*\"`), stringHandler},
 			{regexp.MustCompile(`\;.*`), commentHandler},
-			{regexp.MustCompile(`([a-z][A-Z])+`), identHandler},
+			{regexp.MustCompile(`[a-zA-Z]+`), identHandler},
 			{regexp.MustCompile(`\s+`), skipHandler},
 			{regexp.MustCompile(`[0-9]+(\.[0-9]+)?`), numberHandler},
 			{regexp.MustCompile(`\(`), defaultHandler(OPEN_PR, "(")},
@@ -92,6 +94,7 @@ func createLexer(source string) *lexer {
 			{regexp.MustCompile(`\+`), defaultHandler(PLUS, "+")},
 			{regexp.MustCompile(`\-`), defaultHandler(MINUS, "-")},
 			{regexp.MustCompile(`\*`), defaultHandler(STAR, "*")},
+			{regexp.MustCompile(`\=`), defaultHandler(EQ, "=")},
 		},
 	}
 }
