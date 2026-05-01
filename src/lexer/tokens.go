@@ -8,10 +8,12 @@ const (
 	EOF TokenKind = iota
 	NUMBER
 
-	ADD
+	PLUS
+	MINUS
+	STAR
 
-	OPEN_BR
-	CLOSE_BR
+	OPEN_PR
+	CLOSE_PR
 )
 
 type Token struct {
@@ -39,10 +41,12 @@ func (token Token) IsOneOfMany(expectedKinds ...TokenKind) bool {
 func (token Token) Print() {
 	if token.kind == NUMBER {
 		fmt.Printf(
-			"Type: %s, Value: %s",
+			"Type: %s, Value: %s\n",
 			TokenKindString(token.kind),
 			token.value,
 		)
+	} else {
+		fmt.Printf("Type: %s\n", TokenKindString(token.kind))
 	}
 }
 
@@ -50,13 +54,17 @@ func TokenKindString(kind TokenKind) string {
 	switch kind {
 	case EOF:
 		return "eof"
-	case ADD:
+	case PLUS:
 		return "+"
+	case MINUS:
+		return "-"
+	case STAR:
+		return "*"
 	case NUMBER:
 		return "Num"
-	case OPEN_BR:
+	case OPEN_PR:
 		return "("
-	case CLOSE_BR:
+	case CLOSE_PR:
 		return ")"
 	default:
 		println("Error, token %s not implemented", kind)
