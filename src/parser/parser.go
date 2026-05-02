@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/AkumaKuro/BlitzBasicTranspiler/src/ast"
 	"github.com/AkumaKuro/BlitzBasicTranspiler/src/lexer"
 )
@@ -24,6 +26,7 @@ func Parse(tokens []lexer.Token) ast.BlockStmt {
 }
 
 func createParser(tokens []lexer.Token) *parser {
+	createTokenLookups()
 	return &parser{
 		tokens: tokens,
 	}
@@ -45,4 +48,27 @@ func (p *parser) hasTokens() bool {
 
 func (p *parser) currentTokenKind() lexer.TokenKind {
 	return p.currentToken().Kind
+}
+
+func (p *parser) expectError(expectedKind lexer.TokenKind, err any) lexer.Token {
+	token := p.currentToken()
+	kind := token.Kind
+
+	if kind != expectedKind {
+		if err == nil {
+			err = fmt.Sprintf(
+				"Expected %s, found %s\n",
+				lexer.TokenKindString(expectedKind),
+				lexer.TokenKindString(kind),
+			)
+		}
+
+		panic(err)
+	}
+
+	return p.advance()
+}
+
+func (p *parser) expect(expectedKind lexer.TokenKind) lexer.Token {
+	return p.expectError(expectedKind, nil)
 }

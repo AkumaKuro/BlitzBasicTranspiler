@@ -4,6 +4,8 @@ import (
 	"os"
 
 	"github.com/AkumaKuro/BlitzBasicTranspiler/src/lexer"
+	"github.com/AkumaKuro/BlitzBasicTranspiler/src/parser"
+	"github.com/sanity-io/litter"
 )
 
 func main() {
@@ -12,7 +14,6 @@ func main() {
 
 	tokens := lexer.Tokenize(source)
 
-	for _, token := range tokens {
-		token.Print()
-	}
+	ast := parser.Parse(tokens)
+	litter.Dump(ast)
 }

@@ -179,7 +179,7 @@ var reserved_keywords map[string]TokenKind = map[string]TokenKind{
 
 type Token struct {
 	Kind  TokenKind
-	value string
+	Value string
 }
 
 func NewToken(kind TokenKind, value string) Token {
@@ -204,7 +204,7 @@ func (token Token) Print() {
 		fmt.Printf(
 			"Type: %s, Value: %s\n",
 			TokenKindString(token.Kind),
-			token.value,
+			token.Value,
 		)
 	} else {
 		fmt.Printf("Type: %s\n", TokenKindString(token.Kind))
